@@ -244,12 +244,19 @@ function renderTable() {
           ? `${Number(row.cod).toLocaleString('uk-UA')} ₴`
           : '—';
 
+      const internalNumber =
+        row.internalNumber ||
+        row.raw?.InfoRegClientBarcodes ||
+        row.raw?.ClientBarcode ||
+        '—';
+
       return `<tr>
         <td>
           <a class="ttn-link" href="${TRACK_URL}${encodeURIComponent(row.ttn)}" target="_blank" rel="noopener">
             ${escapeHtml(row.ttn)}
           </a>
         </td>
+        <td class="internal-number">${escapeHtml(internalNumber)}</td>
         <td>${escapeHtml(formatDisplayDate(row.date))}</td>
         <td>${escapeHtml(row.recipient)}</td>
         <td>${escapeHtml(row.phone)}</td>

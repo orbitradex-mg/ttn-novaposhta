@@ -88,8 +88,16 @@ function normalize(doc, tracking) {
   const ttn = doc.IntDocNumber || doc.Number || '';
   const track = tracking.get(ttn);
 
+  const internalNumber = (
+    doc.InfoRegClientBarcodes ||
+    doc.ClientBarcode ||
+    doc.OrderNumber ||
+    ''
+  ).trim();
+
   return {
     ttn,
+    internalNumber: internalNumber || '—',
     date: doc.DateTime || doc.CreateTime || '',
     recipient:
       doc.RecipientContactPerson ||
@@ -100,8 +108,7 @@ function normalize(doc, tracking) {
     city: doc.CityRecipient || doc.RecipientCityName || '—',
     warehouse: doc.RecipientAddressName || '',
     status: track?.Status || doc.StateName || doc.Status || '—',
-    description:
-      doc.Description || doc.AdditionalInformation || doc.InfoRegClientBarcodes || '—',
+    description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || '',
   };
 }

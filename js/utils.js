@@ -68,8 +68,16 @@ export function normalizeDocument(doc, tracking) {
     doc.DocumentStatus ||
     '—';
 
+  const internalNumber = (
+    doc.InfoRegClientBarcodes ||
+    doc.ClientBarcode ||
+    doc.OrderNumber ||
+    ''
+  ).trim();
+
   return {
     ttn,
+    internalNumber: internalNumber || '—',
     date: doc.DateTime || doc.CreateTime || doc.DateCreated || '',
     recipient:
       doc.RecipientContactPerson ||
@@ -80,11 +88,7 @@ export function normalizeDocument(doc, tracking) {
     city: doc.CityRecipient || doc.RecipientCityName || '—',
     warehouse: doc.RecipientAddressName || doc.WarehouseRecipient || '',
     status,
-    description:
-      doc.Description ||
-      doc.AdditionalInformation ||
-      doc.InfoRegClientBarcodes ||
-      '—',
+    description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || doc.DocumentCost || '',
     payer: doc.PayerType || '',
     raw: doc,
@@ -100,6 +104,7 @@ export function matchesSearch(row, query) {
   const q = query.toLowerCase();
   const haystack = [
     row.ttn,
+    row.internalNumber,
     row.recipient,
     row.phone,
     row.city,

@@ -297,6 +297,13 @@ body {
   text-decoration: underline;
 }
 
+.internal-number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: #c4d4e8;
+  white-space: nowrap;
+}
+
 .status {
   display: inline-block;
   max-width: 220px;
@@ -436,8 +443,8 @@ body {
     font-size: 1.1rem;
   }
 
-  .table th:nth-child(n+6),
-  .table td:nth-child(n+6) {
+  .table th:nth-child(n+7),
+  .table td:nth-child(n+7) {
     display: none;
   }
 }
