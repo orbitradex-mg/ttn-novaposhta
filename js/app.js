@@ -1,15 +1,16 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518b';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518b';
 import {
   computeStats,
   defaultDateRange,
+  enrichRow,
   formatApiDate,
   formatDisplayDate,
   isoToApiDate,
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js';
+} from './utils.js?v=20260518b';
 
 const $ = (id) => document.getElementById(id);
 
@@ -147,17 +148,17 @@ async function loadData() {
     if (mode === 'static') {
       result = await loadStaticData();
       allRows = (result.documents || []).map((doc) =>
-        typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map())
+        enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
       );
       setMeta('static', result.syncedAt);
     } else if (mode === 'api' || (mode === 'auto' && hasKey)) {
       result = await loadFromApi();
-      allRows = result.documents;
+      allRows = result.documents.map(enrichRow);
       setMeta('api', result.syncedAt);
     } else {
       result = await loadStaticData();
       allRows = (result.documents || []).map((doc) =>
-        typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map())
+        enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
       );
       setMeta('static', result.syncedAt);
     }
@@ -169,7 +170,7 @@ async function loadData() {
       try {
         const fallback = await loadStaticData();
         allRows = (fallback.documents || []).map((doc) =>
-          typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map())
+          enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
         );
         setMeta('static', fallback.syncedAt);
         renderTable();
@@ -244,19 +245,13 @@ function renderTable() {
           ? `${Number(row.cod).toLocaleString('uk-UA')} ₴`
           : '—';
 
-      const internalNumber =
-        row.internalNumber ||
-        row.raw?.InfoRegClientBarcodes ||
-        row.raw?.ClientBarcode ||
-        '—';
-
       return `<tr>
         <td>
           <a class="ttn-link" href="${TRACK_URL}${encodeURIComponent(row.ttn)}" target="_blank" rel="noopener">
             ${escapeHtml(row.ttn)}
           </a>
         </td>
-        <td class="internal-number">${escapeHtml(internalNumber)}</td>
+        <td class="internal-number">${escapeHtml(row.internalNumber || '—')}</td>
         <td>${escapeHtml(formatDisplayDate(row.date))}</td>
         <td>${escapeHtml(row.recipient)}</td>
         <td>${escapeHtml(row.phone)}</td>

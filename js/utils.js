@@ -58,6 +58,26 @@ export function statusClass(status) {
 /**
  * @param {Record<string, unknown>} doc
  */
+export function enrichRow(doc) {
+  if (!doc) return doc;
+
+  const internalNumber = String(
+    doc.internalNumber ||
+      doc.InfoRegClientBarcodes ||
+      doc.raw?.InfoRegClientBarcodes ||
+      doc.ClientBarcode ||
+      ''
+  ).trim();
+
+  return {
+    ...doc,
+    internalNumber: internalNumber || '—',
+  };
+}
+
+/**
+ * @param {Record<string, unknown>} doc
+ */
 export function normalizeDocument(doc, tracking) {
   const ttn = doc.IntDocNumber || doc.Number || '';
   const track = tracking?.get(ttn);
