@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ТТН Нової пошти</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=20260519">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,10 +20,6 @@
         </div>
       </div>
       <div class="header__actions">
-        <button type="button" class="btn btn--ghost" id="btn-settings" title="Налаштування">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          Налаштування
-        </button>
         <button type="button" class="btn btn--primary" id="btn-refresh">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           Оновити
@@ -42,8 +38,8 @@
           <input type="date" id="date-to" class="field__input">
         </label>
         <label class="field field--grow">
-          <span class="field__label">Пошук (ТТН, внутр. №, отримувач, телефон, опис)</span>
-          <input type="search" id="search" class="field__input" placeholder="Введіть номер або ім'я…">
+          <span class="field__label">Пошук</span>
+          <input type="search" id="search" class="field__input" placeholder="ТТН, внутр. №, ім'я…">
         </label>
       </div>
       <div class="filters__meta">
@@ -75,10 +71,10 @@
       <div id="error" class="state state--error" hidden></div>
       <div id="empty" class="state state--empty" hidden>
         <p>Немає відправлень за обраний період.</p>
-        <p class="text-muted">Перевірте дати або налаштуйте API-ключ у розділі «Налаштування».</p>
+        <p class="text-muted">Спробуйте змінити період дат.</p>
       </div>
       <div class="table-scroll" id="table-container" hidden>
-        <table class="table">
+        <table class="table table--responsive">
           <thead>
             <tr>
               <th>ТТН</th>
@@ -88,8 +84,6 @@
               <th>Телефон</th>
               <th>Місто / відділення</th>
               <th>Статус</th>
-              <th>Опис / замовлення</th>
-              <th>Накладний</th>
               <th></th>
             </tr>
           </thead>
@@ -99,36 +93,8 @@
     </section>
   </div>
 
-  <dialog class="modal" id="settings-modal">
-    <form method="dialog" class="modal__content" id="settings-form">
-      <header class="modal__header">
-        <h2>Налаштування</h2>
-        <button type="button" class="modal__close" id="settings-close" aria-label="Закрити">&times;</button>
-      </header>
-      <div class="modal__body">
-        <label class="field">
-          <span class="field__label">API-ключ Нової пошти</span>
-          <input type="password" id="api-key" class="field__input" autocomplete="off" placeholder="Отримайте в кабінеті business.novaposhta.ua">
-          <span class="field__hint">Зберігається лише у вашому браузері (localStorage). Для спільного доступу без ключа — налаштуйте GitHub Actions (див. README).</span>
-        </label>
-        <label class="field">
-          <span class="field__label">Режим завантаження</span>
-          <select id="load-mode" class="field__input">
-            <option value="auto">Авто: API, якщо є ключ, інакше файл з GitHub</option>
-            <option value="api">Завжди через API (потрібен ключ)</option>
-            <option value="static">Лише з файлу data/shipments.json</option>
-          </select>
-        </label>
-      </div>
-      <footer class="modal__footer">
-        <button type="button" class="btn btn--ghost" id="btn-clear-key">Видалити ключ</button>
-        <button type="submit" class="btn btn--primary">Зберегти</button>
-      </footer>
-    </form>
-  </dialog>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=20260518d"></script>
+  <script type="module" src="js/app.js?v=20260519"></script>
 </body>
 </html>

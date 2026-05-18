@@ -1,5 +1,5 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518d';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518d';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260519';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260519';
 import {
   computeStats,
   defaultDateRange,
@@ -11,7 +11,7 @@ import {
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js?v=20260518d';
+} from './utils.js?v=20260519';
 
 const $ = (id) => document.getElementById(id);
 
@@ -23,20 +23,7 @@ function getApiKey() {
 }
 
 function getLoadMode() {
-  return localStorage.getItem(STORAGE_KEYS.loadMode) || 'auto';
-}
-
-function saveSettings({ apiKey, loadMode }) {
-  if (apiKey !== undefined) {
-    if (apiKey) {
-      localStorage.setItem(STORAGE_KEYS.apiKey, apiKey);
-    } else {
-      localStorage.removeItem(STORAGE_KEYS.apiKey);
-    }
-  }
-  if (loadMode) {
-    localStorage.setItem(STORAGE_KEYS.loadMode, loadMode);
-  }
+  return localStorage.getItem(STORAGE_KEYS.loadMode) || 'static';
 }
 
 function showToast(message) {
@@ -241,26 +228,25 @@ function renderTable() {
   tbody.innerHTML = filtered
     .map((row) => {
       const location = formatLocation(row);
-      const cod =
-        row.cod && Number(row.cod) > 0
-          ? `${Number(row.cod).toLocaleString('uk-UA')} ₴`
-          : '—';
+      const phone = row.phone && row.phone !== '—' ? row.phone : '';
 
       return `<tr>
-        <td>
+        <td data-label="ТТН">
           <a class="ttn-link" href="${TRACK_URL}${encodeURIComponent(row.ttn)}" target="_blank" rel="noopener">
             ${escapeHtml(row.ttn)}
           </a>
         </td>
-        <td class="internal-number">${escapeHtml(row.internalNumber || '—')}</td>
-        <td>${escapeHtml(formatDisplayDate(row.date))}</td>
-        <td>${escapeHtml(row.recipient)}</td>
-        <td>${escapeHtml(row.phone)}</td>
-        <td>${escapeHtml(location || '—')}</td>
-        <td><span class="status ${statusClass(row.status)}">${escapeHtml(row.status)}</span></td>
-        <td>${escapeHtml(row.description)}</td>
-        <td>${escapeHtml(cod)}</td>
-        <td>
+        <td class="internal-number" data-label="Внутр. №">${escapeHtml(row.internalNumber || '—')}</td>
+        <td data-label="Дата">${escapeHtml(formatDisplayDate(row.date))}</td>
+        <td data-label="Отримувач">${escapeHtml(row.recipient)}</td>
+        <td data-label="Телефон">${
+          phone
+            ? `<a class="phone-link" href="tel:${escapeHtml(phone.replace(/\s/g, ''))}">${escapeHtml(phone)}</a>`
+            : '—'
+        }</td>
+        <td data-label="Місто / відділення">${escapeHtml(location || '—')}</td>
+        <td data-label="Статус"><span class="status ${statusClass(row.status)}">${escapeHtml(row.status)}</span></td>
+        <td class="table__actions" data-label="">
           <button type="button" class="btn btn--ghost btn--sm" data-copy="${escapeHtml(row.ttn)}" title="Копіювати ТТН">Копія</button>
         </td>
       </tr>`;
@@ -282,33 +268,8 @@ function renderTable() {
   setUiState('table');
 }
 
-function openSettings() {
-  $('api-key').value = getApiKey();
-  $('load-mode').value = getLoadMode();
-  $('settings-modal').showModal();
-}
-
 function bindEvents() {
   $('btn-refresh').addEventListener('click', () => loadData());
-  $('btn-settings').addEventListener('click', openSettings);
-  $('settings-close').addEventListener('click', () => $('settings-modal').close());
-
-  $('settings-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    saveSettings({
-      apiKey: $('api-key').value.trim(),
-      loadMode: $('load-mode').value,
-    });
-    $('settings-modal').close();
-    showToast('Налаштування збережено');
-    loadData();
-  });
-
-  $('btn-clear-key').addEventListener('click', () => {
-    $('api-key').value = '';
-    saveSettings({ apiKey: '' });
-    showToast('API-ключ видалено');
-  });
 
   let searchTimer;
   $('search').addEventListener('input', () => {

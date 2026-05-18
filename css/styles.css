@@ -304,6 +304,20 @@ body {
   white-space: nowrap;
 }
 
+.phone-link {
+  color: #93c5fd;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.phone-link:hover {
+  text-decoration: underline;
+}
+
+.table__actions {
+  white-space: nowrap;
+}
+
 .status {
   display: inline-block;
   max-width: 220px;
@@ -439,12 +453,144 @@ body {
 }
 
 @media (max-width: 768px) {
-  .header__title {
-    font-size: 1.1rem;
+  .app {
+    padding: 16px 12px 32px;
   }
 
-  .table th:nth-child(n+7),
-  .table td:nth-child(n+7) {
+  .header {
+    margin-bottom: 16px;
+  }
+
+  .header__title {
+    font-size: 1.05rem;
+  }
+
+  .header__subtitle {
+    font-size: 0.8rem;
+  }
+
+  .header__logo {
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .header__actions {
+    width: 100%;
+  }
+
+  .header__actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .filters {
+    padding: 14px;
+  }
+
+  .filters__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 12px 8px;
+  }
+
+  .stat__value {
+    font-size: 1.35rem;
+  }
+
+  .table-scroll {
+    overflow-x: visible;
+  }
+
+  .table--responsive thead {
     display: none;
+  }
+
+  .table--responsive tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    padding: 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .table--responsive tbody tr:hover {
+    background: var(--surface-2);
+  }
+
+  .table--responsive td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table--responsive td:last-child {
+    border-bottom: none;
+    padding-top: 10px;
+    justify-content: flex-end;
+  }
+
+  .table--responsive td::before {
+    content: attr(data-label);
+    flex: 0 0 38%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    padding-top: 2px;
+  }
+
+  .table--responsive td.table__actions::before,
+  .table--responsive td[data-label='']::before {
+    display: none;
+  }
+
+  .table--responsive td:first-child {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+
+  .table--responsive td:first-child::before {
+    display: none;
+  }
+
+  .table--responsive .ttn-link {
+    font-size: 1rem;
+    word-break: break-all;
+  }
+
+  .table--responsive .status {
+    max-width: none;
+    text-align: right;
+  }
+
+  .table--responsive td[data-label='Місто / відділення'] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table--responsive td[data-label='Місто / відділення']::before {
+    flex: none;
   }
 }
