@@ -1,0 +1,13 @@
+{
+  "name": "ttn-novaposhta",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Сторінка перегляду ТТН Нової пошти для менеджерів (GitHub Pages)",
+  "scripts": {
+    "sync": "node --env-file=.env scripts/sync.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
