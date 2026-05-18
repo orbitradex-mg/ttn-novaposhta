@@ -76,13 +76,12 @@ export function extractCity(doc) {
   const geo = doc.OriginalGeoData || doc.originalGeoData;
   const settlement = doc.SettlmentAddressData || doc.settlmentAddressData;
 
-  return (
-    pickText(
-      doc.CityRecipientDescription,
-      doc.RecipientCityName,
-      geo?.RecipientCityName,
-      settlement?.RecipientSettlementDescription
-    ) || '—'
+  return pickText(
+    doc.city,
+    doc.CityRecipientDescription,
+    doc.RecipientCityName,
+    geo?.RecipientCityName,
+    settlement?.RecipientSettlementDescription
   );
 }
 
@@ -94,11 +93,28 @@ export function extractWarehouse(doc) {
   const branchNumber = settlement?.RecipientWarehouseNumber;
 
   return pickText(
+    doc.warehouse,
     doc.RecipientAddressDescription,
     doc.RecipientAddressName,
     branchNumber ? `Відділення №${branchNumber}` : '',
     doc.WarehouseRecipient
   );
+}
+
+/**
+ * @param {Record<string, unknown>} row
+ */
+export function formatLocation(row) {
+  if (!row) return '—';
+
+  const ready = row.location && row.location !== '—' ? String(row.location).trim() : '';
+  if (ready) return ready;
+
+  const parts = [row.city, row.warehouse].filter(
+    (part) => part && part !== '—' && !isUuid(part)
+  );
+
+  return parts.join(', ') || '—';
 }
 
 /**
@@ -108,28 +124,17 @@ export function enrichRow(doc) {
   if (!doc) return doc;
 
   const source = doc.raw || doc;
-  const internalNumber = String(
-    doc.internalNumber ||
-      source.InfoRegClientBarcodes ||
-      doc.InfoRegClientBarcodes ||
-      ''
-  ).trim();
-
-  const city =
-    !isUuid(doc.city) && doc.city && doc.city !== '—'
-      ? String(doc.city).trim()
-      : extractCity(source);
-
-  const warehouse =
-    !isUuid(doc.warehouse) && doc.warehouse
-      ? String(doc.warehouse).trim()
-      : extractWarehouse(source);
+  const internalNumber = pickText(doc.internalNumber, source.InfoRegClientBarcodes, doc.InfoRegClientBarcodes);
+  const city = extractCity(source) || '—';
+  const warehouse = extractWarehouse(source);
+  const location = formatLocation({ city, warehouse, location: doc.location });
 
   return {
     ...doc,
     internalNumber: internalNumber || '—',
     city,
     warehouse,
+    location,
   };
 }
 
@@ -163,8 +168,12 @@ export function normalizeDocument(doc, tracking) {
       doc.CounterpartyRecipientDescription ||
       '—',
     phone: doc.RecipientsPhone || doc.PhoneRecipient || doc.RecipientPhone || '—',
-    city: extractCity(doc),
+    city: extractCity(doc) || '—',
     warehouse: extractWarehouse(doc),
+    location: formatLocation({
+      city: extractCity(doc) || '—',
+      warehouse: extractWarehouse(doc),
+    }),
     status,
     description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || doc.DocumentCost || '',
@@ -185,6 +194,7 @@ export function matchesSearch(row, query) {
     row.internalNumber,
     row.recipient,
     row.phone,
+    row.location,
     row.city,
     row.warehouse,
     row.status,

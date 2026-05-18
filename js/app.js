@@ -1,16 +1,17 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518c';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518c';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518d';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518d';
 import {
   computeStats,
   defaultDateRange,
   enrichRow,
+  formatLocation,
   formatApiDate,
   formatDisplayDate,
   isoToApiDate,
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js?v=20260518c';
+} from './utils.js?v=20260518d';
 
 const $ = (id) => document.getElementById(id);
 
@@ -239,7 +240,7 @@ function renderTable() {
   const tbody = $('table-body');
   tbody.innerHTML = filtered
     .map((row) => {
-      const location = [row.city, row.warehouse].filter(Boolean).join(', ');
+      const location = formatLocation(row);
       const cod =
         row.cod && Number(row.cod) > 0
           ? `${Number(row.cod).toLocaleString('uk-UA')} ₴`

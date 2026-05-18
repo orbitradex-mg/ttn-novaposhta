@@ -95,6 +95,23 @@ function normalize(doc, tracking) {
     ''
   ).trim();
 
+  const city =
+    doc.CityRecipientDescription ||
+    doc.RecipientCityName ||
+    doc.SettlmentAddressData?.RecipientSettlementDescription ||
+    '—';
+
+  const warehouse =
+    doc.RecipientAddressDescription ||
+    doc.RecipientAddressName ||
+    (doc.SettlmentAddressData?.RecipientWarehouseNumber
+      ? `Відділення №${doc.SettlmentAddressData.RecipientWarehouseNumber}`
+      : '');
+
+  const location = [city, warehouse]
+    .filter((part) => part && part !== '—')
+    .join(', ');
+
   return {
     ttn,
     internalNumber: internalNumber || '—',
@@ -105,17 +122,9 @@ function normalize(doc, tracking) {
       doc.CounterpartyRecipientDescription ||
       '—',
     phone: doc.RecipientsPhone || doc.PhoneRecipient || '—',
-    city:
-      doc.CityRecipientDescription ||
-      doc.RecipientCityName ||
-      doc.SettlmentAddressData?.RecipientSettlementDescription ||
-      '—',
-    warehouse:
-      doc.RecipientAddressDescription ||
-      doc.RecipientAddressName ||
-      (doc.SettlmentAddressData?.RecipientWarehouseNumber
-        ? `Відділення №${doc.SettlmentAddressData.RecipientWarehouseNumber}`
-        : ''),
+    city,
+    warehouse,
+    location: location || '—',
     status: track?.Status || doc.StateName || doc.Status || '—',
     description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || '',
