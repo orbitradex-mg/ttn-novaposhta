@@ -55,23 +55,81 @@ export function statusClass(status) {
   return 'status--default';
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value) {
+  return typeof value === 'string' && UUID_RE.test(value.trim());
+}
+
+function pickText(...values) {
+  for (const value of values) {
+    const text = value != null ? String(value).trim() : '';
+    if (text && !isUuid(text)) return text;
+  }
+  return '';
+}
+
+/**
+ * @param {Record<string, unknown>} doc
+ */
+export function extractCity(doc) {
+  const geo = doc.OriginalGeoData || doc.originalGeoData;
+  const settlement = doc.SettlmentAddressData || doc.settlmentAddressData;
+
+  return (
+    pickText(
+      doc.CityRecipientDescription,
+      doc.RecipientCityName,
+      geo?.RecipientCityName,
+      settlement?.RecipientSettlementDescription
+    ) || '—'
+  );
+}
+
+/**
+ * @param {Record<string, unknown>} doc
+ */
+export function extractWarehouse(doc) {
+  const settlement = doc.SettlmentAddressData || doc.settlmentAddressData;
+  const branchNumber = settlement?.RecipientWarehouseNumber;
+
+  return pickText(
+    doc.RecipientAddressDescription,
+    doc.RecipientAddressName,
+    branchNumber ? `Відділення №${branchNumber}` : '',
+    doc.WarehouseRecipient
+  );
+}
+
 /**
  * @param {Record<string, unknown>} doc
  */
 export function enrichRow(doc) {
   if (!doc) return doc;
 
+  const source = doc.raw || doc;
   const internalNumber = String(
     doc.internalNumber ||
+      source.InfoRegClientBarcodes ||
       doc.InfoRegClientBarcodes ||
-      doc.raw?.InfoRegClientBarcodes ||
-      doc.ClientBarcode ||
       ''
   ).trim();
+
+  const city =
+    !isUuid(doc.city) && doc.city && doc.city !== '—'
+      ? String(doc.city).trim()
+      : extractCity(source);
+
+  const warehouse =
+    !isUuid(doc.warehouse) && doc.warehouse
+      ? String(doc.warehouse).trim()
+      : extractWarehouse(source);
 
   return {
     ...doc,
     internalNumber: internalNumber || '—',
+    city,
+    warehouse,
   };
 }
 
@@ -105,8 +163,8 @@ export function normalizeDocument(doc, tracking) {
       doc.CounterpartyRecipientDescription ||
       '—',
     phone: doc.RecipientsPhone || doc.PhoneRecipient || doc.RecipientPhone || '—',
-    city: doc.CityRecipient || doc.RecipientCityName || '—',
-    warehouse: doc.RecipientAddressName || doc.WarehouseRecipient || '',
+    city: extractCity(doc),
+    warehouse: extractWarehouse(doc),
     status,
     description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || doc.DocumentCost || '',

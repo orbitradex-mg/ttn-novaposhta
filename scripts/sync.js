@@ -105,8 +105,17 @@ function normalize(doc, tracking) {
       doc.CounterpartyRecipientDescription ||
       '—',
     phone: doc.RecipientsPhone || doc.PhoneRecipient || '—',
-    city: doc.CityRecipient || doc.RecipientCityName || '—',
-    warehouse: doc.RecipientAddressName || '',
+    city:
+      doc.CityRecipientDescription ||
+      doc.RecipientCityName ||
+      doc.SettlmentAddressData?.RecipientSettlementDescription ||
+      '—',
+    warehouse:
+      doc.RecipientAddressDescription ||
+      doc.RecipientAddressName ||
+      (doc.SettlmentAddressData?.RecipientWarehouseNumber
+        ? `Відділення №${doc.SettlmentAddressData.RecipientWarehouseNumber}`
+        : ''),
     status: track?.Status || doc.StateName || doc.Status || '—',
     description: doc.Description || doc.AdditionalInformation || '—',
     cod: doc.AfterpaymentOnGoodsCost || doc.Cost || '',

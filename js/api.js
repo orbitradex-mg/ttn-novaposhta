@@ -1,4 +1,4 @@
-import { API_URL, PAGE_SIZE } from './config.js?v=20260518b';
+import { API_URL, PAGE_SIZE } from './config.js?v=20260518c';
 
 /**
  * @param {string} apiKey

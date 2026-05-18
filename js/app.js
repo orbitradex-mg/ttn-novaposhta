@@ -1,5 +1,5 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518b';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518b';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260518c';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260518c';
 import {
   computeStats,
   defaultDateRange,
@@ -10,7 +10,7 @@ import {
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js?v=20260518b';
+} from './utils.js?v=20260518c';
 
 const $ = (id) => document.getElementById(id);
 
