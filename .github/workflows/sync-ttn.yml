@@ -1,5 +1,13 @@
 name: Sync Nova Poshta TTN
 
+# Оновлення data/shipments.json:
+# - за розкладом: кожні 2 години за UTC (0:00, 2:00, 4:00 …)
+# - вручну: Actions → цей workflow → Run workflow
+#
+# Якщо в історії лише «Manually run» і немає «scheduled»:
+# GitHub може вимкнути cron після ~60 днів без активності в репозиторії.
+# Увімкніть workflow (Actions → Sync … → Enable workflow) або зробіть будь-який push у main.
+
 on:
   schedule:
     - cron: '0 */2 * * *'
@@ -7,6 +15,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: sync-nova-poshta-ttn
+  cancel-in-progress: false
 
 jobs:
   sync:
