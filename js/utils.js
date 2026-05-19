@@ -167,7 +167,6 @@ export function normalizeDocument(doc, tracking) {
       doc.RecipientName ||
       doc.CounterpartyRecipientDescription ||
       '—',
-    phone: doc.RecipientsPhone || doc.PhoneRecipient || doc.RecipientPhone || '—',
     city: extractCity(doc) || '—',
     warehouse: extractWarehouse(doc),
     location: formatLocation({
@@ -193,7 +192,6 @@ export function matchesSearch(row, query) {
     row.ttn,
     row.internalNumber,
     row.recipient,
-    row.phone,
     row.location,
     row.city,
     row.warehouse,

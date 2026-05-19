@@ -121,7 +121,6 @@ function normalize(doc, tracking) {
       doc.RecipientName ||
       doc.CounterpartyRecipientDescription ||
       '—',
-    phone: doc.RecipientsPhone || doc.PhoneRecipient || '—',
     city,
     warehouse,
     location: location || '—',

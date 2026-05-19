@@ -304,16 +304,6 @@ body {
   white-space: nowrap;
 }
 
-.phone-link {
-  color: #93c5fd;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.phone-link:hover {
-  text-decoration: underline;
-}
-
 .table__actions {
   white-space: nowrap;
 }

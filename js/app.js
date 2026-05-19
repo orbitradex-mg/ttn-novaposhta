@@ -1,5 +1,5 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260519b';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260519b';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260520';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260520';
 import {
   computeStats,
   defaultDateRange,
@@ -11,7 +11,7 @@ import {
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js?v=20260519b';
+} from './utils.js?v=20260520';
 
 const $ = (id) => document.getElementById(id);
 
@@ -245,8 +245,6 @@ function renderTable() {
   tbody.innerHTML = filtered
     .map((row) => {
       const location = formatLocation(row);
-      const phone = row.phone && row.phone !== '—' ? row.phone : '';
-
       return `<tr>
         <td data-label="ТТН">
           <a class="ttn-link" href="${TRACK_URL}${encodeURIComponent(row.ttn)}" target="_blank" rel="noopener">
@@ -256,11 +254,6 @@ function renderTable() {
         <td class="internal-number" data-label="Внутр. №">${escapeHtml(row.internalNumber || '—')}</td>
         <td data-label="Дата">${escapeHtml(formatDisplayDate(row.date))}</td>
         <td data-label="Отримувач">${escapeHtml(row.recipient)}</td>
-        <td data-label="Телефон">${
-          phone
-            ? `<a class="phone-link" href="tel:${escapeHtml(phone.replace(/\s/g, ''))}">${escapeHtml(phone)}</a>`
-            : '—'
-        }</td>
         <td data-label="Місто / відділення">${escapeHtml(location || '—')}</td>
         <td data-label="Статус"><span class="status ${statusClass(row.status)}">${escapeHtml(row.status)}</span></td>
         <td class="table__actions" data-label="">
