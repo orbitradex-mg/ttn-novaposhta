@@ -1,5 +1,5 @@
-import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260519';
-import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260519';
+import { fetchAllDocuments, fetchTrackingStatuses } from './api.js?v=20260519b';
+import { STATIC_DATA_PATH, STORAGE_KEYS, TRACK_URL } from './config.js?v=20260519b';
 import {
   computeStats,
   defaultDateRange,
@@ -11,7 +11,7 @@ import {
   matchesSearch,
   normalizeDocument,
   statusClass,
-} from './utils.js?v=20260519';
+} from './utils.js?v=20260519b';
 
 const $ = (id) => document.getElementById(id);
 
@@ -59,6 +59,20 @@ function initDates() {
 
   $('date-from').value = savedFrom || formatInputDate(from);
   $('date-to').value = savedTo || formatInputDate(to);
+  bumpDateToThroughToday();
+}
+
+/** Якщо «По дату» у браузері збережено стару дату — нові відправлення з JSON не показуються. */
+function bumpDateToThroughToday() {
+  const toInput = $('date-to');
+  if (!toInput?.value) return;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(`${toInput.value}T12:00:00`);
+  if (!Number.isNaN(end.getTime()) && end < today) {
+    toInput.value = formatInputDate(new Date());
+    persistDates();
+  }
 }
 
 function formatInputDate(date) {
@@ -139,6 +153,7 @@ async function loadData() {
         enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
       );
       setMeta('static', result.syncedAt);
+      bumpDateToThroughToday();
     } else if (mode === 'api' || (mode === 'auto' && hasKey)) {
       result = await loadFromApi();
       allRows = result.documents.map(enrichRow);
@@ -149,6 +164,7 @@ async function loadData() {
         enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
       );
       setMeta('static', result.syncedAt);
+      bumpDateToThroughToday();
     }
 
     renderTable();
@@ -161,6 +177,7 @@ async function loadData() {
           enrichRow(typeof doc.ttn !== 'undefined' ? doc : normalizeDocument(doc, new Map()))
         );
         setMeta('static', fallback.syncedAt);
+        bumpDateToThroughToday();
         renderTable();
         showToast('API недоступний — показано збережені дані');
         return;

@@ -26,6 +26,8 @@
 
 Якщо cron з організаційних причин недоступний, залишайте періодичний **ручний** запуск або зовнішній cron (наприклад, раз на годину виклик [workflow_dispatch через API](https://docs.github.com/en/rest/actions/workflows?apiVersion=2022-11-28#create-a-workflow-dispatch-event) з Personal Access Token).
 
+**Важливо:** push у `main` з job’а Actions через стандартний `GITHUB_TOKEN` **не запускає** інші workflows (зокрема старий лише `push`-тригер для Pages). Тому після синхронізації `data/shipments.json` у цьому репозиторії **у тому ж workflow** виконується redeploy GitHub Pages (`publish-pages`), і сайт отримує актуальний JSON.
+
 ## Швидкий старт (GitHub Pages)
 
 ### 1. Створіть репозиторій на GitHub

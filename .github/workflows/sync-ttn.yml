@@ -1,12 +1,8 @@
 name: Sync Nova Poshta TTN
 
-# Оновлення data/shipments.json:
-# - за розкладом: кожні 2 години за UTC (0:00, 2:00, 4:00 …)
-# - вручну: Actions → цей workflow → Run workflow
-#
-# Якщо в історії лише «Manually run» і немає «scheduled»:
-# GitHub може вимкнути cron після ~60 днів без активності в репозиторії.
-# Увімкніть workflow (Actions → Sync … → Enable workflow) або зробіть будь-який push у main.
+# 1) Тягнемо ЕН з API → commit data/shipments.json (push через GITHUB_TOKEN).
+# 2) Push з GITHUB_TOKEN НЕ запускає інші workflows — тому після зміни файлу
+#    обов'язково деплоїмо GitHub Pages у цьому ж workflow (job publish-pages).
 
 on:
   schedule:
@@ -14,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: sync-nova-poshta-ttn
@@ -23,6 +19,10 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      data_changed: ${{ steps.commit.outputs.data_changed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -37,13 +37,48 @@ jobs:
         run: node scripts/sync.js
 
       - name: Commit updated data
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/shipments.json
           if git diff --staged --quiet; then
-            echo "No changes"
+            echo "No changes to shipments.json"
+            echo "data_changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "chore: sync Nova Poshta shipments"
             git push
+            echo "data_changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+  publish-pages:
+    name: Redeploy GitHub Pages
+    needs: sync
+    if: needs.sync.outputs.data_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
