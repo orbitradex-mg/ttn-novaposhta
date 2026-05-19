@@ -3,10 +3,11 @@ name: Sync Nova Poshta TTN
 # 1) Тягнемо ЕН з API → commit data/shipments.json (push через GITHUB_TOKEN).
 # 2) Push з GITHUB_TOKEN НЕ запускає інші workflows — тому після зміни файлу
 #    обов'язково деплоїмо GitHub Pages у цьому ж workflow (job publish-pages).
+# Розклад: кожні 5 хв (UTC); GitHub може злегка зсувати час під навантаженням.
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
